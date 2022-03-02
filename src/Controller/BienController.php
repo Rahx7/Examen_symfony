@@ -38,16 +38,14 @@ class BienController extends AbstractController
                     // $data = $form->getData();
                     
                     
-                    $arrayData = ["pmin"=> $form->get('piecemin')->getData(),
-                    "pmax"=> $form->get('piecemax')->getData(),
-                    "smin"=> $form->get('surfacemin')->getData(),
-                    "smax"=> $form->get('surfacemax')->getData(),
-                    "prmin"=> $form->get('prixmin')->getData(),
-                    "prmax"=> $form->get('prixmax')->getData(), 
-                ];
-
-                    
-                    
+                    $arrayData = [
+                        "pmin"=> $form->get('piecemin')->getData(),
+                        "pmax"=> $form->get('piecemax')->getData(),
+                        "smin"=> $form->get('surfacemin')->getData(),
+                        "smax"=> $form->get('surfacemax')->getData(),
+                        "prmin"=> $form->get('prixmin')->getData(),
+                        "prmax"=> $form->get('prixmax')->getData(), 
+                    ];
 
                     $biens = $manager->getRepository(Bien::class)->findSearch($arrayData);
                     
