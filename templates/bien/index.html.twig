@@ -1,0 +1,179 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}bienvenue dans les biens !{% endblock %}
+
+{% block body %}
+
+
+    {% if formSearch  is defined %}  
+        
+        <style>
+            .ui.form {
+                display:flex;
+                align-items: end;
+                font-size: 100%;
+            }
+            .ui.form > div  {
+         margin: 3px;
+            }
+            .extra.content {
+                display:flex;
+                flex-direction: column;
+            }
+            
+        </style>
+
+            <div>
+            {{ form(formSearch)}}
+            </div>
+
+    {% endif %}
+
+    {# route /biens ou /accueil #}
+    {% if biens is defined %} 
+        {# {{ dump(biens) }} #}
+        <div class="ui cards" >
+            {% for bien in biens %}
+                
+                    <div class="card">
+
+                        <div class="image">
+                             <img src={{bien.photo}}/>
+                        </div>
+
+                        <div class="content">
+                            <div class="header">{{bien.titre}}</div>
+                            <div class="meta">
+                                <span >{{bien.type}}</span>à
+                                <span>{{bien.typeTransac}}</span>
+                            </div>
+                            <div class="description">
+                                {{bien.description}}
+                            </div>
+                        </div>
+
+                        <div class="extra content">
+                            <span class="right floated">
+                                construction : {{bien.dateConstruction|format('Y-m-d H:i:s')}}
+                            </span>
+                            <span class="right floated">
+                                <i class="user icon"></i>
+                                agent : {{bien.agent.nom}}
+                            </span>
+                            <span>
+                                
+                                prix :  {{bien.prix}}
+                            </span>
+                            <span>
+                                {# <i class="user icon"></i> #}
+                                surface :  {{bien.surface}}
+                            </span>
+                            <span>
+                                {# <i class="user icon"></i> #}
+                                nombre de pièces :  {{bien.floor}}
+                            </span>
+                        </div>
+                        <a href={{path('biens_single', {id:bien.id}  )}}>
+                            <div class="ui bottom attached button">
+                                <i class="add icon"></i>
+                                en savoir plus 
+                            </div>
+                        </a>
+                    </div>
+
+                
+             {% endfor %}
+         </div>  
+
+          
+
+    {% endif %}
+
+
+    {# route /bien/id #}
+    {% if bien  is defined %}
+
+        <style>
+            .ui.container{
+
+                display:flex;
+            }
+            .ui.container > div{
+
+                width:100%;
+            }
+            .extra.content {
+                display:flex;
+                flex-direction: column;
+            }
+        </style>
+
+        <div>
+
+            <div class="ui cards">
+                    
+                        <div class="card">
+    
+                            <div class="image">
+                                 <img src={{bien.photo}}/>
+                            </div>
+    
+                            <div class="content">
+                                <div class="header">{{bien.titre}}</div>
+                                <div class="meta">
+                                    <span >{{bien.type}}</span> à
+                                    <span>{{bien.typeTransac}}</span>
+                                </div>
+                                <div class="description">
+                                    {{bien.description}}
+                                </div>
+                            </div>
+    
+                            <div class="extra content">
+                                <span class="right floated">
+                                    construction {{bien.dateConstruction|format('Y-m-d H:i:s')}}
+                                </span>
+                                <span class="right floated">
+                                    <i class="user icon"></i>
+                                    agent : {{bien.agent.nom}}
+                                </span>
+                                <span>
+                                    
+                                    prix :  {{bien.prix}}
+                                </span>
+                                <span>
+                                    {# <i class="user icon"></i> #}
+                                    surface :  {{bien.surface}}
+                                </span>
+                                <span>
+                                    {# <i class="user icon"></i> #}
+                                    nombre de pièces :  {{bien.floor}}
+                                </span>
+                            </div>
+    
+                        </div>
+                    
+
+             </div>  
+
+        </div>
+  
+        <div>
+           
+        {{form_start(formMail, {'action': path('mail', {id:bien.id})} ) }}
+        {{form_rest(formMail)}}
+            {# {{form_row(formMail.submit)}} #}
+        {{form_end(formMail)}}
+        </div>
+
+    {% endif %}
+
+
+
+
+
+
+
+
+
+{% endblock %}
