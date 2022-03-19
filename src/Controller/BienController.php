@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Bien;
+use App\Entity\Mail;
 use App\Form\MailCustomType;
 use App\Form\SearchCustomType;
 use Symfony\Component\Mime\Email;
@@ -21,7 +22,7 @@ class BienController extends AbstractController
     {
   
         return $this->render('bien/index.html.twig', [
-            'biens' => $manager->getRepository(Bien::class)->findAll()
+            'biens' => $manager->getRepository(Bien::class)->accueil()
         ]);
 
     }
@@ -47,6 +48,7 @@ class BienController extends AbstractController
                         "prmax"=> $form->get('prixmax')->getData(), 
                     ];
 
+
                     $biens = $manager->getRepository(Bien::class)->findSearch($arrayData);
                     
                     // dump($biens);
@@ -69,30 +71,33 @@ class BienController extends AbstractController
 
     #[Route('/biens/{id}', name: 'biens_single', requirements:['id'=>'\d+'], methods:["POST","GET"])]  
     #[Route('/bien/{id}/mail', name:'mail', methods:["POST","GET"])] 
-    public function single(int $id, ManagerRegistry $manager, Request $request, MailerInterface $mailer ): Response
+    public function single(int $id, ManagerRegistry $manager, Request $request, MailerInterface $mailer): Response
     {     
 
-        $form = $this->createForm(MailCustomType::class, );
+        $mailEnvoi = New Mail;
+
+        $form = $this->createForm(MailCustomType::class, $mailEnvoi);
         $form->handleRequest($request);
         
         // dump($request);
         
         if($form->isSubmitted() && $form->isValid())
-
                 {
-                    // $data = $form->getData();
+                    $om = $manager->getManager();
+
                     $bienMail = $manager->getRepository(Bien::class)->find($id);
                    
                     $agent = $bienMail->getAgent();
-
                     //  dump($rdv->format('Y-m-d H:i:s'));
 
                     // die(); 
                     // $agent = $bienMail->agent;
+                    $mailEnvoi->setAgent($agent);
+
                     $nom = $form->get('nom')->getData();
                     $prenom = $form->get('prenom')->getData();
-                    $mail = $form->get('mail')->getData();
-                    $rdv = $form->get('RDV')->getData();
+                    $mail = $form->get('email')->getData();
+                    $rdv = $form->get('rdv')->getData();
                     $mailAgent = $agent->getEmail();
 
                     
@@ -100,14 +105,18 @@ class BienController extends AbstractController
                     // $manager->getRepository(Bien::class)->mailCustom($data);
 
                     $email = (new Email())
-                    ->from($mail)
-                    ->to($mailAgent)
-                    ->subject('nouveau rdv avec '.$nom.' '.$prenom)
-                    ->text('un rendez-vous est à valider pour le ' .$rdv->format('Y-m-d H:i:s').' concernant le bien Id '.$bienMail->getId(). ' intitulé '.$bienMail->getTitre());
-        
-                    // $mailer->send($email);
+                        ->from($mail) // ya probablement un hic passque l'envoyeur du mail n'est pas 
+                        ->to($mailAgent, $mail)
+                        ->subject('nouveau rdv avec '.$nom.' '.$prenom)
+                        ->text('un rendez-vous est à valider pour le '.$rdv->format('Y-m-d H:i:s').' concernant le bien Id '.$bienMail->getId().' intitulé '.$bienMail->getTitre());
+            
+                    $mailer->send($email); //
+
+                    $om->persist($mailEnvoi);
+                    $om->flush();
 
                     $this->addFlash('success', 'votre email a bien été envoyé');
+                    // die();
                     return $this->redirectToRoute('accueil');
                 }
 

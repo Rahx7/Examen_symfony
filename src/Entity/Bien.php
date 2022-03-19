@@ -3,12 +3,16 @@
 namespace App\Entity;
 
 
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BienRepository;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\File;
+// use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BienRepository::class)]
-class Bien
+class Bien implements \Serializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,7 +26,7 @@ class Bien
     private $description;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Assert\File( mimeTypes:["image/png", "image/jpeg"], mimeTypesMessage:"le format de fichier ne correspond pas")]
+    #[File( mimeTypes:["image/png", "image/jpeg"], mimeTypesMessage:"le format de fichier ne correspond pas")]
     private $photo;
 
     #[ORM\Column(type: 'integer')]
@@ -64,6 +68,18 @@ class Bien
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'biens')]
     #[ORM\JoinColumn(nullable: false)]
     private $agent;
+
+    #[ORM\OneToMany(mappedBy: 'bien', targetEntity: Photo::class, orphanRemoval: true)]
+    private $photos;
+
+    #[ORM\Column(type: 'array', nullable: true)]
+    private $photos2 = [];
+
+    public function __construct()
+    {
+        $this->photos = new ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -277,7 +293,92 @@ class Bien
 
     public function __toString()
     {
-        return  $this->agent; 
+        $text = $this->titre.' avec l\'id '.$this->id;
+        return  $text; 
     }
+
+    /**
+     * @return Collection<int, Photo>
+     */
+    public function getPhotos(): Collection
+    {
+        return $this->photos;
+    }
+
+    public function addPhoto(Photo $photo): self
+    {
+        if (!$this->photos->contains($photo)) {
+            $this->photos[] = $photo;
+            $photo->setBien($this);
+        }
+
+        return $this;
+    }
+
+    public function removePhoto(Photo $photo): self
+    {
+        if ($this->photos->removeElement($photo)) {
+            // set the owning side to null (unless already changed)
+            if ($photo->getBien() === $this) {
+                $photo->setBien(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPhotos2(): ?array
+    {
+        return $this->photos2;
+    }
+
+    public function setPhotos2(?array $photos2): self
+    {
+        $this->photos2 = $photos2;
+
+        return $this;
+    }
+
+ 
+    public function serialize() {
+
+        return serialize(array(
+        $this->id,
+
+        ));
+        
+        }
+        
+        public function unserialize($serialized) {
+        
+        list (
+        $this->id,
+
+        ) = unserialize($serialized);
+        }
+    ////////////////////// test 
+    // public function serialize()
+    // {
+    //     return serialize(array(
+    //         $this->id,
+    //         $this->username,
+    //         $this->password,
+    //         // see section on salt below
+    //         // $this->salt,
+    //     ));
+    // }
+
+    // public function unserialize($serialized)
+    // {
+    //     list (
+    //         $this->id,
+    //         $this->username,
+    //         $this->password,
+    //         // see section on salt below
+    //         // $this->salt
+    //     ) = unserialize($serialized);
+    // }
+
+
 
 }

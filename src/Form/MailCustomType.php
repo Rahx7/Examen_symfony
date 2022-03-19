@@ -2,13 +2,18 @@
 
 namespace App\Form;
 
+use App\Entity\Bien;
+use App\Entity\Mail;
+use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class MailCustomType extends AbstractType
 {
@@ -17,19 +22,38 @@ class MailCustomType extends AbstractType
         $builder
             ->add('prenom', TextType::class , [
                 'label'=>'votre prénom',
-                'mapped' => false,
+                // 'mapped' => false,
             ])
             ->add('nom', TextType::class , [
                 'label'=>'votre nom',
-                'mapped' => false,
+                
             ])
-            ->add('mail', EmailType::class , [
+            ->add('email', EmailType::class , [
                 'label'=>'votre mail',
-                'mapped' => false,
+                
             ])
-            ->add('RDV', DateType::class , [
+            ->add('rdv', DateTimeType::class , [
                 'label'=>'date de rendez_vous',
-                'mapped' => false,
+                'widget' => 'single_text',
+            ])
+
+            ->add('agent', EntityType::class , [
+                'label'=>'Agent en charge',
+                'class'=> User::class,
+                'attr'=>[
+                    // 'class'=>'hidden',
+                    'disabled'=>'disabled'
+                ]   
+            ])
+            
+            ->add('leBien', EntityType::class , [
+                'label'=>"concerne l'immobilier",
+                'class'=> Bien::class,
+                'mapped'=>false,
+                'attr'=>[
+                    // 'class'=>'hidden',
+                    'disabled'=>'disabled'
+                ]   
             ])
 
             ->add('submit', SubmitType::class, [
@@ -46,7 +70,7 @@ class MailCustomType extends AbstractType
     {
         $resolver->setDefaults([
             'method'=>'POST',
-            // 'action'=> $this->redirectToRoute('mail')
+            'data_class' => Mail::class,
         ]);
     }
 }

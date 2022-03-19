@@ -1,1 +1,12 @@
 {% extends '@EasyAdmin/layout.html.twig' %}
+
+    {% block main %}
+            
+        {% for user in Users %}
+            <div> les ROLE_ADMIN {{ user.nom }}  </div>
+        {% endfor %}
+
+        il y a {{ Users | length }} utilisateurs
+        Vous avez 
+
+    {% endblock %}

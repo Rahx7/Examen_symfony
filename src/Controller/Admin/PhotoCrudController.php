@@ -3,20 +3,22 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\Photo;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
-class UserCrudController extends AbstractCrudController
+class PhotoCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return User::class;
+        return Photo::class;
     }
 
     
@@ -24,11 +26,18 @@ class UserCrudController extends AbstractCrudController
     {
         return [
             // IdField::new('id'),
-            TextField::new('nom'),
-            EmailField::new('email'),
-            // TextField::new('password')->setFormType(PasswordType::class),
-            BooleanField::new('is_verified'),
-            ArrayField::new('roles'),
+            ImageField::new('nom','ma photo')
+                ->setBasePath('upload/')
+                ->setUploadDir('public/upload/')
+                // ->setFormType(FileUploadType::class)
+                // ->setFormTypeOption('allow_delete', false)
+                // ->setFormTypeOption('upload_delete', function(File $file) { dump("coucou"); die(); })
+                // ->setRequired(false),
+                ->setUploadedFileNamePattern('[randomhash].[extension]'),
+
+            TextField::new('description'),
+            AssociationField::new('bien'),
+
 
         ];
     }

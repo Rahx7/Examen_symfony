@@ -3,9 +3,20 @@
 {% block title %}bienvenue dans les biens !{% endblock %}
 
 {% block body %}
+    <style>
+        
+            .accueil{
+                margin-bottom:40px;
+                padding-bottom: 20px;
+                border-bottom: 1px dotted #ccc;
+            }
+        </style>
+    <div class="accueil"> <h3>Bienvenue a l'agence qui le vaut bien ! </h3> 
+        visitez en ligne les biens immobiliers que nous vons a disposition. n'hésitez pas a prendre rendez-vous avec un agent de l'agence par le formulaire de chaque bien immobiliers .  </div>
+        
+            
 
-
-    {% if formSearch  is defined %}  
+   {% if formSearch  is defined %}  
         
         <style>
             .ui.form {
@@ -21,9 +32,13 @@
                 flex-direction: column;
             }
             
+            .ui.cards{
+             margin-top:0px 
+            }
+
         </style>
 
-            <div>
+        <div>
             {{ form(formSearch)}}
             </div>
 
@@ -38,7 +53,7 @@
                     <div class="card">
 
                         <div class="image">
-                             <img src={{bien.photo}}/>
+                             <img src="{{ asset('upload/'~ bien.photo) }}" />
                         </div>
 
                         <div class="content">
@@ -54,7 +69,11 @@
 
                         <div class="extra content">
                             <span class="right floated">
-                                construction : {{bien.dateConstruction|format('Y-m-d H:i:s')}}
+                                {% if bien.dateConstruction is defined and bien.dateConstruction is not null %}
+                                  {%  set date = bien.dateConstruction %}
+                                construction : {{date.format('d/m/Y')}}
+                                {# |format('Y-m-d H:i:s') #}
+                                {% endif %}
                             </span>
                             <span class="right floated">
                                 <i class="user icon"></i>
@@ -62,11 +81,11 @@
                             </span>
                             <span>
                                 
-                                prix :  {{bien.prix}}
+                                prix :  {{bien.prix}} Euros
                             </span>
                             <span>
                                 {# <i class="user icon"></i> #}
-                                surface :  {{bien.surface}}
+                                surface :  {{bien.surface}} m²
                             </span>
                             <span>
                                 {# <i class="user icon"></i> #}
@@ -91,31 +110,64 @@
 
 
     {# route /bien/id #}
-    {% if bien  is defined %}
+    {% if bien  is defined  %}
 
         <style>
+            div{
+                box-sizing: border-box;
+            }
             .ui.container{
 
                 display:flex;
+                flex-wrap: wrap;
             }
             .ui.container > div{
 
-                width:100%;
+            margin: 15px;
+                
             }
             .extra.content {
                 display:flex;
                 flex-direction: column;
             }
+            .hidden{
+
+            visibility: hidden;
+        }
+        .ui.card, .ui.cards>.card {
+            width: 100%;
+        }
+        .infos{
+
+            padding: 20px;
+            border-top: 1px dotted #ccc;
+            background-color: #f8f8f8;
+
+        }
+        .infos > div{
+
+          display: flex;
+          flex-wrap: wrap;
+          align-items: baseline;
+        }
+        h4{
+            border-bottom: 1px dotted #ccc ;
+            margin: 10px 0px;
+        }
+        img{
+            width: 100%;
+        }
+
         </style>
 
-        <div>
+        <div style="width: 59%; ">
 
             <div class="ui cards">
                     
                         <div class="card">
     
                             <div class="image">
-                                 <img src={{bien.photo}}/>
+                                 <img src="{{asset('upload/'~ bien.photo)}}"/>
                             </div>
     
                             <div class="content">
@@ -131,7 +183,10 @@
     
                             <div class="extra content">
                                 <span class="right floated">
-                                    construction {{bien.dateConstruction|format('Y-m-d H:i:s')}}
+                                    {% if bien.dateConstruction is defined and bien.dateConstruction is not null %}
+                                        {%  set date = bien.dateConstruction %}
+                                      construction : {{date.format('d/m/Y')}}
+                                        {% endif %}
                                 </span>
                                 <span class="right floated">
                                     <i class="user icon"></i>
@@ -139,11 +194,11 @@
                                 </span>
                                 <span>
                                     
-                                    prix :  {{bien.prix}}
+                                    prix :  {{bien.prix}} Euros
                                 </span>
                                 <span>
                                     {# <i class="user icon"></i> #}
-                                    surface :  {{bien.surface}}
+                                    surface :  {{bien.surface}} m²
                                 </span>
                                 <span>
                                     {# <i class="user icon"></i> #}
@@ -158,22 +213,54 @@
 
         </div>
   
-        <div>
+        <div style="width: 27%">
            
-        {{form_start(formMail, {'action': path('mail', {id:bien.id})} ) }}
-        {{form_rest(formMail)}}
-            {# {{form_row(formMail.submit)}} #}
-        {{form_end(formMail)}}
+            {{form_start(formMail, {'action': path('mail', {id:bien.id})} ) }}
+            {# {{form_rest(formMail)}} #}
+                {{form_row(formMail.prenom)}} 
+                {{form_row(formMail.nom)}} 
+                {{form_row(formMail.email)}} 
+                {{form_row(formMail.rdv )}} 
+
+                {{form_row(formMail.leBien, {'value':bien.id})}} 
+                {{form_row(formMail.agent, {'value':bien.agent.id})}} 
+               
+
+            {{form_end(formMail)}}
+        </div>
+        
+        <div class="infos" style="width: 100%">
+            <div>
+              <h4 style="width: 100%;"> Description </h4> <div style="width: 100%;">{{bien.description}} </div><br><br>
+              <h4> nombre de chambre  </h4> {{bien.room}}
+              <h4> nombre de pièce </h4> {{bien.floor}}
+              <h4> Prix </h4> {{bien.prix}} Euros <br>
+              <h4> Type de bien </h4> {{bien.type}} à {{bien.typeTransac}}
+              <h4> etage </h4> {{bien.etage}}
+              <h4> surface </h4> {{bien.surfaceTerrain}} m²
+              <h4 style="width: 100%;"> Adresse </h4> {{bien.adresse}}
+              <h4 style="width: 100%;" > Options </h4> 
+              {% if bien.options is not empty %}
+                <ul>
+                    {% for item in bien.options %}
+                   <li> option {% set i = loop.index %} {{i}}  {{item}} </li>
+                    {% endfor %}
+                </ul>
+                {% else %} <h3 class="ui message"> il n'y a pas d'options pour ce bien ! </h3><br>
+              {% endif %}
+
+              <h4  style="width: 100%;"> Photos </h4> 
+                {% if bien.photos is not empty %}
+                    {% for item in bien.photos %}
+                        <div class="photo"> 
+                            photo n°  {{item.id}} <img src="{{asset('upload/'~ item.nom)}}"/> {{item.description}} 
+                        </div>
+                    {% endfor %}
+                {% else %} <h3 class="ui message"> il n'y a pas de photos pour ce bien ! </h3><br>
+              {% endif %}
+            </div>
         </div>
 
     {% endif %}
-
-
-
-
-
-
-
-
 
 {% endblock %}

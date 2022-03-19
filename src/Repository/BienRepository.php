@@ -32,6 +32,7 @@ class BienRepository extends ServiceEntityRepository
         // dump($data);
 
         $req =  $this->createQueryBuilder('b')
+        
                 ->setParameter('pmin', $data['pmin'])
                 ->setParameter('pmax', $data['pmax'])
                 ->setParameter('smin', $data['smin'])
@@ -69,7 +70,7 @@ class BienRepository extends ServiceEntityRepository
                 // ->addSelect('user')
                 // ->andWhere('b.agent_id' === 'id')
 
-                ->setMaxResults(10)
+                ->setMaxResults(3)
                 ->getQuery()
                 ->getResult()
             ;
